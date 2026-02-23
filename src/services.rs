@@ -1,5 +1,7 @@
 use std::collections::LinkedList;
 use std::io;
+extern crate dialoguer;
+use dialoguer::{theme::ColorfulTheme, Select};
 
 #[derive(Debug)] 
 pub struct Entry{
@@ -73,15 +75,54 @@ pub(crate) fn list(my_list: &TodoList) {
 }
 
 
+pub(crate) fn mark_done(my_list: &mut TodoList){
 
 
-fn main() {
+    if my_list.tasks.is_empty(){
+        println!("Empty List");
+        return;
+    }
 
- let mut my_list = TodoList {
-    tasks: LinkedList::new(),
-};
-    add(&mut my_list);
+    let names_task: Vec<String> = my_list.tasks.iter().map(|TaskName|{
+        let status = if TaskName.done { "[X]"} else {"[ ]"};
+        format!("{} {}", TaskName.task, status)
+    } 
+    ).collect();
 
-    list(&my_list);
 
+    println!("\n--- CLI Task Manager ---");
+    let selecao = Select::with_theme(&ColorfulTheme::default())
+    .with_prompt("Select one to mark as done:")
+    .default(0)
+    .items(&names_task)
+    .interact()
+    .unwrap();
+
+    if let Some(chosed_task) = my_list.tasks.iter_mut().nth(selecao){
+        chosed_task.mark_complet();
+        println!("{} marked as completed", chosed_task.task);
+    }
+}
+
+pub(crate) fn done(my_list: &mut TodoList) {
+    
+    println!("===================");
+    println!("Your To Do List");
+
+    for (indice, tarefa) in my_list.tasks.iter().enumerate() {
+
+        let status = if tarefa.done{
+            "[x]"
+        }else{
+            "[ ]"
+        };
+
+    
+    println!("{} {} {}", indice + 1, status, tarefa.task, );
+    }
+
+    let mut input_user = String::new();
+    
+
+    println!("===================") 
 }
