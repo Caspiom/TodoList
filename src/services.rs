@@ -11,13 +11,13 @@ pub struct Entry{
 
 #[derive(Debug)]
 pub struct TodoList {
-    tasks: LinkedList<Entry>,
+    tasks: Vec<Entry>,
 }
 
 impl TodoList{
     pub(crate) fn new() -> TodoList{
         TodoList{
-            tasks: LinkedList::new(),
+            tasks: Vec::new(),
         }
     }
 }
@@ -34,7 +34,8 @@ impl Entry{
 
     pub fn mark_complet(&mut self){
         self.done = true;
-    }    
+    }
+    
 }
 
 pub(crate) fn add(my_list: &mut TodoList) {
@@ -50,7 +51,7 @@ pub(crate) fn add(my_list: &mut TodoList) {
 
     let new_task = Entry::new_todo(clean_text);
 
-    my_list.tasks.push_back(new_task);
+    my_list.tasks.push(new_task);
 }
 
 
@@ -77,52 +78,57 @@ pub(crate) fn list(my_list: &TodoList) {
 
 pub(crate) fn mark_done(my_list: &mut TodoList){
 
-
-    if my_list.tasks.is_empty(){
-        println!("Empty List");
+    if is_empty(my_list){
         return;
     }
 
+    let selecao = select_list("Select one task to mark as done:", my_list);
+
+    if let Some(chosed_task) = my_list.tasks.get_mut(selecao){
+        chosed_task.mark_complet();
+        println!("{} marked as completed", chosed_task.task);
+    }
+}
+
+
+pub (crate) fn remove_task(my_list: &mut TodoList){
+
+    if is_empty(my_list){
+        return;
+    }
+
+    let selecao = select_list("Select one task to delete:", my_list);
+
+    let removed_task = my_list.tasks.remove(selecao);
+
+    println!("Task {} removed", removed_task.task);
+}
+
+fn select_list(text: &str, my_list: &TodoList) -> usize{
+
     let names_task: Vec<String> = my_list.tasks.iter().map(|TaskName|{
         let status = if TaskName.done { "[X]"} else {"[ ]"};
-        format!("{} {}", TaskName.task, status)
+        format!("{} {}",  status, TaskName.task)
     } 
     ).collect();
 
 
     println!("\n--- CLI Task Manager ---");
     let selecao = Select::with_theme(&ColorfulTheme::default())
-    .with_prompt("Select one to mark as done:")
+    .with_prompt(text)
     .default(0)
     .items(&names_task)
     .interact()
     .unwrap();
 
-    if let Some(chosed_task) = my_list.tasks.iter_mut().nth(selecao){
-        chosed_task.mark_complet();
-        println!("{} marked as completed", chosed_task.task);
-    }
+    return selecao;
 }
 
-pub(crate) fn done(my_list: &mut TodoList) {
-    
-    println!("===================");
-    println!("Your To Do List");
-
-    for (indice, tarefa) in my_list.tasks.iter().enumerate() {
-
-        let status = if tarefa.done{
-            "[x]"
-        }else{
-            "[ ]"
-        };
-
-    
-    println!("{} {} {}", indice + 1, status, tarefa.task, );
+fn is_empty(my_list: &TodoList) -> bool{ 
+    if my_list.tasks.is_empty(){
+        println!("Empty List");
+        true
+    } else {
+        false
     }
-
-    let mut input_user = String::new();
-    
-
-    println!("===================") 
 }

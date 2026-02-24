@@ -1,13 +1,13 @@
 mod services;
 extern crate dialoguer;
-use services::{TodoList, add, list, mark_done};
+use services::{TodoList, add, list, mark_done, remove_task};
 use std::collections::LinkedList;
 use dialoguer::{theme::ColorfulTheme, Select};
 
 fn main() {
  let mut my_list = TodoList::new();
 
- let options = &["Add", "List", "Mark as done" ,"Exit"];
+ let options = &["Add", "List", "Mark as done", "Remove" ,"Exit"];
  loop {
 
     println!("\n--- CLI Task Manager ---");
@@ -32,6 +32,10 @@ fn main() {
             mark_done(&mut my_list);
         }
         3 => {
+            println!("Remove");
+            remove_task(&mut my_list);
+        }
+        4 => {
             println!("Exit");
             break;
         }
