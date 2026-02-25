@@ -1,15 +1,17 @@
 use std::collections::LinkedList;
 use std::io;
+use std::fs;
 extern crate dialoguer;
 use dialoguer::{theme::ColorfulTheme, Select};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug)] 
+#[derive(Debug, Serialize, Deserialize)] 
 pub struct Entry{
     pub task: String,
     pub done: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TodoList {
     tasks: Vec<Entry>,
 }
@@ -131,4 +133,11 @@ fn is_empty(my_list: &TodoList) -> bool{
     } else {
         false
     }
+}
+
+pub(crate) fn save_to_file(my_list: &TodoList) {
+    let json_formated = serde_json::to_string_pretty(my_list).expect("Error to converte list to JSON");
+
+    fs::write("tasks.json", json_formated).expect("Error to save in disk");
+    println!("Saved!");
 }
